@@ -37,14 +37,14 @@ import Text.XML.HXT.Core
   )
 import Text.HandsomeSoup (css)
 
-type SearchResult = 
+type SearchResult =
   Either SearchResultErr [String]
 
-data SearchResultErr = 
+data SearchResultErr =
     NoResultsErr
   | TooManyResultsErr
   | UnknownErr
-  deriving (Show, Eq)
+  deriving (Eq, Show)
 
 myRequestURL :: String
 myRequestURL = "http://www.virginia.edu/cgi-local/ldapweb"
@@ -61,9 +61,9 @@ myRequest query = Request {
     where body  = "whitepages=" ++ query
 
 getDoc query = do
-  streamResult <- simpleHTTP $ myRequest query
-  body <- getResponseBody streamResult
-  return $ readString [withParseHTML yes, withWarnings no] body
+  response <- simpleHTTP $ myRequest query
+  html <- getResponseBody response
+  return $ readString [withParseHTML yes, withWarnings no] html
 
 scanDoc doc = do
   errMsgs <- runX $ doc >>> css "h3" //> getText 
@@ -112,4 +112,3 @@ nextQuery query =
      then nextQuery $ init query
      else init query ++ [succ $ last query]
 endQuery = [succ 'z']
-

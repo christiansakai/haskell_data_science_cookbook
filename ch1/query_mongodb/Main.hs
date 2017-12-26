@@ -23,19 +23,16 @@ import Database.MongoDB
   , Action
   )
 import Data.Bson (Document)
+import Control.Monad.IO.Class
 
 main :: IO ()
 main = do
-  let dbName = "test"
+  let db = "test"
       hostName = "127.0.0.1"
-
-  pipe <- connect (host hostName)
-  document <- access pipe master dbName run
-
+  pipe <- connect . host $ hostName
+  result <- access pipe master db run
   close pipe
-  print document
+  print result
 
-run :: Action IO [Document]
-run = 
-  rest =<< find (select [] "people") { sort = [] }
- 
+run :: MonadIO m => Action m [Document]
+run = rest =<< find (select [] "people") { sort = [] }
